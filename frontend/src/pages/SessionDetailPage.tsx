@@ -5,6 +5,7 @@ import { importApi } from '../api/import.api';
 import { SessionDetail } from '../components/history/SessionDetail';
 import { LogViewer } from '../components/history/LogViewer';
 import { ErrorReport } from '../components/history/ErrorReport';
+import { TransactionPreview } from '../components/history/TransactionPreview';
 import { Spinner } from '../components/ui/Spinner';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -65,6 +66,8 @@ export function SessionDetailPage() {
         hasErrors={session.invalidRows > 0 || session.status === 'failed'} 
       />
 
+      {session.status === 'completed' && <TransactionPreview sessionId={session.id} />}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           {logsLoading ? (
@@ -88,7 +91,7 @@ export function SessionDetailPage() {
                 variant="secondary"
                 className="w-full justify-start"
                 disabled={session.status !== 'completed'}
-                onClick={() => window.open(`/api/v1/import/sessions/${session.id}/outputs/finance`, '_blank')}
+                onClick={() => window.open(`/api/import/sessions/${session.id}/outputs/finance`, '_blank')}
               >
                 <FileText className="mr-3 h-5 w-5 text-accent-secondary" />
                 <div className="flex-1 text-left">
@@ -102,7 +105,7 @@ export function SessionDetailPage() {
                 variant="secondary"
                 className="w-full justify-start"
                 disabled={session.status !== 'completed'}
-                onClick={() => window.open(`/api/v1/import/sessions/${session.id}/outputs/marketing`, '_blank')}
+                onClick={() => window.open(`/api/import/sessions/${session.id}/outputs/marketing`, '_blank')}
               >
                 <FileText className="mr-3 h-5 w-5 text-accent-primary" />
                 <div className="flex-1 text-left">

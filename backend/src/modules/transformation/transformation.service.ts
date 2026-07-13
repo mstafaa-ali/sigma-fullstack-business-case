@@ -181,7 +181,11 @@ export class TransformationService {
       return this.expandBundle(raw, product, platform, store, admin, advertiser, region, promoCode, dateInfo);
     }
 
-    const hpp = this.hppResolver.resolve(productCode, platform.id);
+    let hpp = this.hppResolver.resolve(productCode, platform.id);
+    if (!hpp || hpp === 0) {
+      // Fallback: Jika HPP di master data kosong/0, gunakan Harga Jual (Unit Price) sebagai pengganti HPP
+      hpp = raw.unit_price || (raw.total_per_line ? raw.total_per_line / (raw.quantity || 1) : 0);
+    }
     const paymentType = this.paymentTypeResolver.resolve(platform.id) || '';
 
     return [{
@@ -232,9 +236,14 @@ export class TransformationService {
     const rows: TransformedRowDTO[] = [];
 
     for (const item of bundleItems) {
-      const hpp = this.hppResolver.resolveForBundleItem(product.product_code, item.item_code, platform.id);
+      let hpp = this.hppResolver.resolveForBundleItem(product.product_code, item.item_code, platform.id);
       const priceSplit = this.hppResolver.getBundlePriceSplit(product.product_code, item.item_code, platform.id);
       
+      // Fallback: Jika HPP bundle kosong, gunakan porsi split finance_price atau bagi rata Unit Price
+      if (!hpp || hpp === 0) {
+        hpp = priceSplit.finance_price > 0 ? priceSplit.finance_price : ((raw.unit_price || (raw.total_per_line ? raw.total_per_line / (raw.quantity || 1) : 0)) / bundleItems.length);
+      }
+
       const paymentType = this.paymentTypeResolver.resolve(platform.id, priceSplit.payment_type_override) || '';
 
       rows.push({
@@ -253,11 +262,11 @@ export class TransformationService {
         product_name: item.item_name,
         product_code_original: raw.product_code,
         quantity: raw.quantity || 1,
-        omzet: priceSplit.finance_price,
-        marketing_omzet: priceSplit.marketing_price,
+        omzet: priceSplit.finance_price > 0 ? priceSplit.finance_price : ((raw.unit_price || (raw.total_per_line ? raw.total_per_line / (raw.quantity || 1) : 0)) / bundleItems.length),
+        marketing_omzet: priceSplit.marketing_price > 0 ? priceSplit.marketing_price : ((raw.unit_price || (raw.total_per_line ? raw.total_per_line / (raw.quantity || 1) : 0)) / bundleItems.length),
         hpp: hpp * (raw.quantity || 1),
         promo_code: promoCode,
-        total_bayar: priceSplit.finance_price,
+        total_bayar: priceSplit.finance_price > 0 ? priceSplit.finance_price : ((raw.unit_price || (raw.total_per_line ? raw.total_per_line / (raw.quantity || 1) : 0)) / bundleItems.length),
         payment_type: paymentType,
         year: dateInfo.year,
         month_name: dateInfo.monthName,

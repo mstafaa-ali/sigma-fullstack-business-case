@@ -123,4 +123,18 @@ export class ImportService extends BaseService<ImportSession, any, any> {
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer as unknown as Buffer;
   }
+
+  async getTransformedData(id: string, page: number = 1, limit: number = 50) {
+    const { salesTransformedRepository } = await import('../sales/sales-transformed.repository');
+    const result = await salesTransformedRepository.findBySessionId(id, { page, limit });
+    return {
+      data: result.data,
+      meta: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+      },
+    };
+  }
 }

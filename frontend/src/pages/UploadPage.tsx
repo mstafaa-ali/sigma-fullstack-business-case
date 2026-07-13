@@ -32,7 +32,7 @@ export function UploadPage() {
     <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
       <div>
         <h1 className="text-2xl font-bold text-text-primary">Upload Data</h1>
-        <p className="text-text-secondary mt-1">Upload exactly 3 Excel files to begin the transformation process.</p>
+        <p className="text-text-secondary mt-1">Upload 1 or more Excel files to begin the transformation process.</p>
       </div>
 
       <Card>
@@ -66,7 +66,7 @@ export function UploadPage() {
               <Button
                 variant="primary"
                 onClick={handleUpload}
-                disabled={files.length !== 3}
+                disabled={files.length === 0}
                 size="lg"
               >
                 <UploadCloud className="mr-2 h-5 w-5" />

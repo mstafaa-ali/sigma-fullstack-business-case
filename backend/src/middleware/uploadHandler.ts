@@ -34,4 +34,4 @@ export const uploadExcel = multer({
   storage,
   fileFilter,
   limits: { fileSize: config.MAX_FILE_SIZE },
-}).array('files', 3); // Maksimal 3 file sekaligus
+}).array('files', 10); // Maksimal 10 file sekaligus

@@ -11,16 +11,16 @@ export class ImportController {
 
   /**
    * POST /api/import/upload
-   * Upload 3 Excel files dan mulai proses import
+   * Upload 1 or more Excel files dan mulai proses import
    */
   upload = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const files = req.files as Express.Multer.File[];
       
-      if (!files || files.length !== 3) {
+      if (!files || files.length === 0) {
         res.status(400).json({
           success: false,
-          error: { code: 'INVALID_FILES', message: 'Exactly 3 Excel files required' }
+          error: { code: 'INVALID_FILES', message: 'At least 1 Excel file is required' }
         });
         return;
       }
@@ -141,6 +141,24 @@ export class ImportController {
       
       const fileStream = fs.createReadStream(filePath);
       fileStream.pipe(res);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * GET /api/import/sessions/:id/transformed
+   * Fetch paginated transformed data for preview
+   */
+  getTransformedData = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { page, limit } = req.query;
+      const data = await this.importService.getTransformedData(
+        req.params.id as string,
+        Number(page) || 1,
+        Number(limit) || 50
+      );
+      res.json({ success: true, data });
     } catch (error) {
       next(error);
     }

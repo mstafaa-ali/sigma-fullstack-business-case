@@ -34,5 +34,9 @@ export const importApi = {
 
   downloadErrorLog: (sessionId: string) => {
     return apiClient.get(`/import/sessions/${sessionId}/logs/download`, { responseType: 'blob' });
+  },
+
+  getTransformedData: (sessionId: string, page = 1, limit = 50) => {
+    return apiClient.get<ApiResponse<PaginatedResponse<any>>>(`/import/sessions/${sessionId}/transformed?page=${page}&limit=${limit}`);
   }
 };

@@ -12,5 +12,6 @@ router.get('/sessions/:id/progress', streamProgress);
 router.get('/sessions/:id/logs', importController.getSessionLogs);
 router.get('/sessions/:id/logs/download', importController.downloadLogs);
 router.get('/sessions/:id/outputs/:type', importController.downloadOutput);
+router.get('/sessions/:id/transformed', importController.getTransformedData);
 
 export const importRoutes = router;

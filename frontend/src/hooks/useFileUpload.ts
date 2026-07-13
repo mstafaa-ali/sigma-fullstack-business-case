@@ -27,7 +27,7 @@ export function useFileUpload() {
       );
       
       // Max files limit
-      const combined = [...prev.files, ...valid].slice(0, CONSTANTS.UPLOAD_FILES_REQUIRED);
+      const combined = [...prev.files, ...valid].slice(0, CONSTANTS.UPLOAD_MAX_FILES);
       return { ...prev, files: combined, error: null };
     });
   }, []);
@@ -40,8 +40,8 @@ export function useFileUpload() {
   }, []);
 
   const upload = useCallback(async () => {
-    if (state.files.length !== CONSTANTS.UPLOAD_FILES_REQUIRED) {
-      setState(prev => ({ ...prev, error: `Please upload exactly ${CONSTANTS.UPLOAD_FILES_REQUIRED} Excel files` }));
+    if (state.files.length === 0) {
+      setState(prev => ({ ...prev, error: `Please upload at least 1 Excel file (max ${CONSTANTS.UPLOAD_MAX_FILES})` }));
       return;
     }
 
