@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { ImportService } from './import.service';
 import { importRepository } from './import.repository';
+import path from 'path';
+import fs from 'fs';
+
+const OUTPUT_DIR = path.resolve(process.cwd(), '../result');
 
 export class ImportController {
   constructor(private importService: ImportService) {}
@@ -43,12 +47,13 @@ export class ImportController {
    */
   getSessions = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { page, limit } = req.query;
+      const { page, limit, status } = req.query;
       const result = await this.importService.getSessions({
         page: Number(page) || 1,
         limit: Number(limit) || 20,
+        status: status as string || undefined,
       });
-      res.json({ success: true, ...result });
+      res.json({ success: true, data: result });
     } catch (error) {
       next(error);
     }
@@ -102,6 +107,45 @@ export class ImportController {
       next(error);
     }
   };
+
+  /**
+   * GET /api/import/sessions/:id/outputs/:type
+   * Download generated output file (finance or marketing)
+   */
+  downloadOutput = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id: sessionId, type } = req.params;
+      const validTypes = ['finance', 'marketing'];
+      
+      if (!validTypes.includes(type.toLowerCase())) {
+        res.status(400).json({ 
+          success: false, 
+          error: { message: `Invalid output type. Must be one of: ${validTypes.join(', ')}` } 
+        });
+        return;
+      }
+
+      const fileName = `${type.toUpperCase()}_${sessionId}.xlsx`;
+      const filePath = path.join(OUTPUT_DIR, fileName);
+
+      if (!fs.existsSync(filePath)) {
+        res.status(404).json({ 
+          success: false, 
+          error: { message: `Output file not found. The import may not have completed yet.` } 
+        });
+        return;
+      }
+
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename=${type.toUpperCase()}.xlsx`);
+      
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
 
 export const importController = new ImportController(new ImportService(importRepository));
+

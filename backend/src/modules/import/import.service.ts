@@ -31,20 +31,72 @@ export class ImportService extends BaseService<ImportSession, any, any> {
     return session;
   }
 
-  async getSessions(options?: { page?: number; limit?: number }): Promise<{ data: ImportSession[]; total: number }> {
-    return this.repository.findAll({
-      ...options,
+  private mapSessionToResponse(session: ImportSession) {
+    let mappedStatus = session.status;
+    if (session.status === 'completed') {
+      if (session.skipped_rows > 0 && session.success_rows === 0) {
+        mappedStatus = 'skipped';
+      } else if (session.skipped_rows > 0) {
+        mappedStatus = 'partial_success';
+      }
+    }
+
+    return {
+      id: session.id,
+      status: mappedStatus,
+      startTime: session.started_at || session.created_at,
+      endTime: session.completed_at,
+      totalRows: session.total_rows || 0,
+      validRows: session.success_rows || 0,
+      invalidRows: session.error_rows || 0,
+      skippedRows: session.skipped_rows || 0,
+      processedRows: session.processed_rows || 0,
+      fileNames: typeof session.file_names === 'string' 
+        ? JSON.parse(session.file_names) 
+        : session.file_names,
+      errorMessage: null,
+      createdAt: session.created_at,
+    };
+  }
+
+  async getSessions(options?: { page?: number; limit?: number; status?: string }): Promise<{
+    data: any[];
+    meta: { page: number; limit: number; total: number; totalPages: number };
+  }> {
+    const page = options?.page || 1;
+    const limit = options?.limit || 20;
+
+    const result = await this.repository.findAll({
+      page,
+      limit,
       orderBy: 'created_at',
       order: 'desc'
     });
+
+    return {
+      data: result.data.map(s => this.mapSessionToResponse(s)),
+      meta: {
+        page,
+        limit,
+        total: result.total,
+        totalPages: Math.ceil(result.total / limit),
+      },
+    };
   }
 
-  async getSessionById(id: string): Promise<ImportSession | null> {
-    return this.repository.findById(id);
+  async getSessionById(id: string): Promise<any | null> {
+    const session = await this.repository.findById(id);
+    if (!session) return null;
+    return this.mapSessionToResponse(session);
   }
 
   async getSessionLogs(id: string, level?: string): Promise<ImportLog[]> {
     return this.repository.getLogsBySessionId(id, level);
+  }
+
+  async hasErrors(sessionId: string): Promise<boolean> {
+    const logs = await this.repository.getLogsBySessionId(sessionId, 'error');
+    return logs.length > 0;
   }
 
   async generateLogFile(id: string): Promise<Buffer> {

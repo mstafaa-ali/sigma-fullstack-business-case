@@ -3,6 +3,7 @@ import { redisConfig } from '../config/redis';
 import { QUEUE_NAMES, JOB_NAMES } from '../queues/queue.constants';
 import { publishProgress } from '../modules/import/sse/sse.service';
 import { importQueue } from '../queues/import.queue';
+import { ImportRepository } from '../modules/import/import.repository';
 
 import { TransformationService } from '../modules/transformation/transformation.service';
 import { ProductResolver } from '../modules/transformation/resolvers/product.resolver';
@@ -58,6 +59,13 @@ export const transformDataProcessor = async (job: Job<TransformJobData>) => {
         step: 'transforming',
         message: `Transformed ${current}/${total} rows...`,
       });
+    });
+    
+    const importRepo = new ImportRepository();
+    await importRepo.incrementSessionCounters(sessionId, {
+      success_rows: result.success,
+      skipped_rows: result.skipped,
+      error_rows: result.errors,
     });
     
     await importQueue.add(JOB_NAMES.GENERATE_OUTPUT, { sessionId });

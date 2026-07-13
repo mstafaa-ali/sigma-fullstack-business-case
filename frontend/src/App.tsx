@@ -1,21 +1,36 @@
-import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
+import { AppLayout } from './components/layout/AppLayout';
+import { DashboardPage } from './pages/DashboardPage';
+import { UploadPage } from './pages/UploadPage';
+import { HistoryPage } from './pages/HistoryPage';
+import { SessionDetailPage } from './pages/SessionDetailPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 
-function App() {
-  const [healthStatus, setHealthStatus] = useState<string>('checking...');
-
-  useEffect(() => {
-    fetch('/api/health')
-      .then(res => res.json())
-      .then(data => setHealthStatus(data.status))
-      .catch(err => setHealthStatus('error: ' + err.message));
-  }, []);
-
+export default function App() {
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Sales Transformation Engine</h1>
-      <p>API Health Status: <strong>{healthStatus}</strong></p>
-    </div>
+    <BrowserRouter>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: 'var(--color-bg-secondary)',
+            color: 'var(--color-text-primary)',
+            border: '1px solid var(--color-border-subtle)',
+            borderRadius: '0.375rem',
+          },
+        }}
+      />
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/upload" element={<UploadPage />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/history/:id" element={<SessionDetailPage />} />
+        </Route>
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
   );
-}
-
-export default App;
+};

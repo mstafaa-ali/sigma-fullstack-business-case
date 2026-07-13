@@ -3,6 +3,7 @@ import { redisConfig } from '../config/redis';
 import { QUEUE_NAMES, JOB_NAMES } from '../queues/queue.constants';
 import { publishProgress } from '../modules/import/sse/sse.service';
 import { ImportRepository } from '../modules/import/import.repository';
+import { SalesRawRepository } from '../modules/sales/sales-raw.repository';
 
 import { OutputGeneratorService } from '../modules/transformation/output/output-generator.service';
 import fs from 'fs/promises';
@@ -19,6 +20,7 @@ export const generateOutputProcessor = async (job: Job<GenerateJobData>) => {
     
     const { sessionId } = job.data;
     const importRepo = new ImportRepository();
+    const salesRawRepo = new SalesRawRepository();
     
     await publishProgress(sessionId, {
       type: 'status_change',
@@ -47,7 +49,13 @@ export const generateOutputProcessor = async (job: Job<GenerateJobData>) => {
     const marketingPath = path.join(OUTPUT_DIR, `MARKETING_${sessionId}.xlsx`);
     await fs.writeFile(marketingPath, marketingBuffer);
 
-    await importRepo.updateSession(sessionId, { status: 'completed' });
+    // Update session with accurate total_rows from sales_raw
+    const { total: totalRows } = await salesRawRepo.findBySessionId(sessionId, { page: 1, limit: 1 });
+    
+    await importRepo.updateSession(sessionId, { 
+      status: 'completed',
+      total_rows: totalRows,
+    });
     
     await publishProgress(sessionId, {
       type: 'completed',
@@ -57,3 +65,4 @@ export const generateOutputProcessor = async (job: Job<GenerateJobData>) => {
     
     return { status: 'generated', financePath, marketingPath };
 };
+

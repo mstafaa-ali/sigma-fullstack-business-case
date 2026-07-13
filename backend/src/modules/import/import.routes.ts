@@ -11,5 +11,6 @@ router.get('/sessions/:id', importController.getSession);
 router.get('/sessions/:id/progress', streamProgress);
 router.get('/sessions/:id/logs', importController.getSessionLogs);
 router.get('/sessions/:id/logs/download', importController.downloadLogs);
+router.get('/sessions/:id/outputs/:type', importController.downloadOutput);
 
 export const importRoutes = router;

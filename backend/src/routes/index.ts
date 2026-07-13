@@ -8,6 +8,7 @@ import { advertiserRoutes } from '../modules/advertiser/advertiser.routes';
 import { priceRuleRoutes } from '../modules/price-rule/price-rule.routes';
 import { columnMappingRoutes } from '../modules/column-mapping/column-mapping.routes';
 import { importRoutes } from '../modules/import/import.routes';
+import { dashboardRoutes } from '../modules/dashboard/dashboard.routes';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use('/advertisers', advertiserRoutes);
 router.use('/price-rules', priceRuleRoutes);
 router.use('/column-mappings', columnMappingRoutes);
 router.use('/import', importRoutes);
+router.use('/dashboard', dashboardRoutes);
 
 export default router;

@@ -48,15 +48,13 @@ export const validateFilesProcessor = async (job: Job<ValidateJobData>) => {
         message: `Validating ${file.originalname}...`,
       });
 
-      // Detect file type
-      const detectedType = await validator.detectFileType(file.path);
-      file.fileType = detectedType;
+      // Detect file type and validate headers
+      const { fileType, valid, errors } = await validator.detectAndValidate(file.path);
+      file.fileType = fileType;
 
-      // Validate headers
-      const validation = await validator.validateHeaders(file.path, detectedType);
-      if (!validation.valid) {
+      if (!valid) {
         validationErrors.push(
-          ...validation.errors.map(e => `${file.originalname}: ${e}`)
+          ...errors.map(e => `${file.originalname}: ${e}`)
         );
       }
     }

@@ -36,7 +36,17 @@ export const parseInsertProcessor = async (job: Job<ParseJobData>) => {
     let processedRows = 0;
     let errorRows = 0;
 
-    reader.on('chunk', async (chunk) => {
+    // Collect chunks and process them sequentially after reading
+    const chunks: any[][] = [];
+
+    reader.on('chunk', (chunk) => {
+      chunks.push(chunk);
+    });
+
+    await reader.readFileStreaming(filePath, columnMap);
+
+    // Now process all chunks sequentially (reader has finished)
+    for (const chunk of chunks) {
       try {
         await TransactionManager.run(async (trx) => {
           const rows = chunk.map((row: any) => ({
@@ -74,11 +84,9 @@ export const parseInsertProcessor = async (job: Job<ParseJobData>) => {
           raw_data: JSON.stringify(chunk),
         });
       }
-    });
+    }
 
-    await reader.readFileStreaming(filePath, columnMap);
-
-    // Update session counters
+    // Update session counters — now accurate since all chunks are processed
     await importRepo.incrementSessionCounters(sessionId, {
       processed_rows: processedRows,
       error_rows: errorRows,
