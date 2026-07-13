@@ -1,0 +1,38 @@
+import { z } from 'zod';
+
+export const SalesTransformedSchema = z.object({
+  id: z.number().int(),
+  raw_id: z.number().int().nullable(),
+  session_id: z.string().uuid(),
+  closing_date: z.date().nullable(),
+  order_date: z.date().nullable(),
+  invoice_number: z.string(),
+  tracking_number: z.string().nullable(),
+  expedition: z.string().nullable(),
+  transaction_type: z.string().nullable(),
+  advertiser_name: z.string().nullable(),
+  platform_name: z.string().nullable(),
+  store_name: z.string().nullable(),
+  admin_name: z.string().nullable(),
+  product_name: z.string().nullable(),
+  product_code_original: z.string().nullable(),
+  sku: z.string().nullable(),
+  quantity: z.number().int(),
+  omzet: z.number().nullable(),
+  marketing_omzet: z.number().nullable(),
+  hpp: z.number().nullable(),
+  promo_code: z.string().nullable(),
+  total_bayar: z.number().nullable(),
+  payment_type: z.string().nullable(),
+  year: z.number().int().nullable(),
+  month_name: z.string().nullable(),
+  memo: z.string().nullable(),
+  region: z.string().nullable(),
+  is_bundle_item: z.boolean(),
+  bundle_parent_code: z.string().nullable(),
+  row_number: z.number().int(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
+export type SalesTransformedDTO = z.infer<typeof SalesTransformedSchema>;
