@@ -24,7 +24,7 @@ const processor = async (job: Job) => {
 
 export const mainWorker = new Worker(QUEUE_NAMES.IMPORT, processor, {
   connection: redisConfig,
-  concurrency: 3,
+  concurrency: 1, // Changed from 3 to 1 to prevent Out of Memory (OOM) crashes on large files
 });
 
 export const importWorkers = [mainWorker];

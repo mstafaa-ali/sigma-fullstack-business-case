@@ -1,0 +1,5 @@
+export const CONSTANTS = {
+  UPLOAD_FILES_REQUIRED: 3,
+  SUPPORTED_EXTENSIONS: ['.xlsx', '.xls'],
+  MAX_FILE_SIZE: 50 * 1024 * 1024, // 50MB
+};

@@ -10,21 +10,27 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.2",
     "axios": "^1.x",
+    "clsx": "^2.1.1",
     "lucide-react": "^0.460.x",
     "react": "^19.x",
     "react-dom": "^19.x",
     "react-dropzone": "^14.x",
     "react-hot-toast": "^2.x",
     "react-router-dom": "^7.x",
-    "recharts": "^2.x"
+    "recharts": "^2.x",
+    "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
     "@types/react": "^19.x",
     "@types/react-dom": "^19.x",
     "@vitejs/plugin-react": "^4.x",
+    "autoprefixer": "^10.5.2",
     "eslint": "^9.x",
+    "postcss": "^8.5.18",
     "prettier": "^3.x",
+    "tailwindcss": "^4.3.2",
     "typescript": "^5.x",
     "vite": "^6.x"
   }

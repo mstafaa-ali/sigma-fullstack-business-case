@@ -2,6 +2,7 @@ import { SalesRawRepository } from '../sales/sales-raw.repository';
 import { SalesTransformedRepository } from '../sales/sales-transformed.repository';
 import { SalesRawDTO } from '../sales/dto/sales-raw.dto';
 import { TransformedRowDTO } from './dto/transformed-row.dto';
+import { importRepository } from '../import/import.repository';
 import { ProductResolver } from './resolvers/product.resolver';
 import { PlatformResolver } from './resolvers/platform.resolver';
 import { StoreResolver } from './resolvers/store.resolver';
@@ -49,7 +50,7 @@ export class TransformationService {
   async transformSession(
     sessionId: string,
     onProgress?: (current: number, total: number) => void
-  ): Promise<{ success: number; errors: number }> {
+  ): Promise<{ success: number; errors: number; skipped: number }> {
     await this.preloadMasterData();
 
     const salesRawRepo = new SalesRawRepository();
@@ -58,6 +59,7 @@ export class TransformationService {
     let offset = 0;
     let successCount = 0;
     let errorCount = 0;
+    let skippedCount = 0;
     let totalProcessedRawRows = 0;
     
     // First we get total count
@@ -72,13 +74,12 @@ export class TransformationService {
 
       if (rawRows.length === 0) break;
 
-      const transformedRows: TransformedRowDTO[] = [];
+      const rawWithRows: { rawId: number, rows: TransformedRowDTO[] }[] = [];
 
       for (const raw of rawRows) {
         try {
           const rows = await this.transformRow(raw);
-          transformedRows.push(...rows);
-          successCount++;
+          rawWithRows.push({ rawId: raw.id, rows });
         } catch (error: any) {
           console.error(`Error transforming row ${raw.id}:`, error);
           errorCount++;
@@ -86,14 +87,64 @@ export class TransformationService {
         totalProcessedRawRows++;
       }
 
-      if (transformedRows.length > 0) {
-        // Use Knex transaction via salesTransformedRepo knex instance
+      if (rawWithRows.length > 0) {
         const knex = salesTransformedRepo.getKnex();
+        
+        // Flatten to get all transformed rows
+        const allTransformedRows = rawWithRows.flatMap(item => item.rows);
+        
+        // Find existing records to deduplicate
+        const invoiceNumbers = Array.from(new Set(allTransformedRows.map(r => r.invoice_number).filter(Boolean)));
+        
+        let existingRows: any[] = [];
+        if (invoiceNumbers.length > 0) {
+           existingRows = await knex('sales_transformed')
+            .select('invoice_number', 'product_code_original', 'product_name')
+            .whereIn('invoice_number', invoiceNumbers);
+        }
+
+        const existingKeys = new Set(
+          existingRows.map(r => `${r.invoice_number}|${r.product_code_original}|${r.product_name}`)
+        );
+
+        const newTransformedRows: TransformedRowDTO[] = [];
+        
+        for (const item of rawWithRows) {
+          let hasNewRows = false;
+          // Retrieve the raw item to get file type if needed
+          const raw = rawRows.find(r => r.id === item.rawId) || {} as any;
+          
+          for (const row of item.rows) {
+            const key = `${row.invoice_number}|${row.product_code_original}|${row.product_name}`;
+            if (!existingKeys.has(key)) {
+              newTransformedRows.push(row);
+              existingKeys.add(key); // prevent duplicates within the same chunk
+              hasNewRows = true;
+            } else {
+              // Log the duplicate skip
+              await importRepository.createLog({
+                session_id: sessionId,
+                file_name: `Transformed File: ${raw.file_type || 'Unknown'}`,
+                row_number: row.row_number || 0,
+                log_level: 'warn',
+                message: `Skipped duplicate record: Invoice ${row.invoice_number}, Product ${row.product_name}`,
+                raw_data: JSON.stringify(row),
+              });
+            }
+          }
+          
+          if (hasNewRows) {
+            successCount++;
+          } else {
+            skippedCount++;
+          }
+        }
+
         await knex.transaction(async (trx: any) => {
           // Chunk insertions if too many
           const chunkSize = 100;
-          for (let i = 0; i < transformedRows.length; i += chunkSize) {
-            const chunk = transformedRows.slice(i, i + chunkSize);
+          for (let i = 0; i < newTransformedRows.length; i += chunkSize) {
+            const chunk = newTransformedRows.slice(i, i + chunkSize);
             await trx('sales_transformed').insert(chunk).onConflict(['session_id', 'invoice_number', 'product_name', 'product_code_original', 'row_number']).merge();
           }
 
@@ -106,7 +157,7 @@ export class TransformationService {
       onProgress?.(totalProcessedRawRows, total);
     }
 
-    return { success: successCount, errors: errorCount };
+    return { success: successCount, errors: errorCount, skipped: skippedCount };
   }
 
   private async transformRow(raw: SalesRawDTO): Promise<TransformedRowDTO[]> {
