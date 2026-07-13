@@ -8,7 +8,13 @@
     "dev": "nodemon",
     "build": "tsc",
     "lint": "eslint src --ext .ts",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "vitest run tests/e2e",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "bullmq": "^5.x",
@@ -32,13 +38,18 @@
     "@types/morgan": "^1.x",
     "@types/multer": "^1.x",
     "@types/pg": "^8.x",
+    "@types/supertest": "^7.2.0",
     "@types/uuid": "^10.x",
     "@typescript-eslint/eslint-plugin": "^8.x",
     "@typescript-eslint/parser": "^8.x",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.x",
     "nodemon": "^3.x",
     "prettier": "^3.x",
+    "supertest": "^7.2.2",
+    "ts-node": "^10.9.2",
     "tsx": "^4.x",
-    "typescript": "^5.x"
+    "typescript": "^5.x",
+    "vitest": "^4.1.10"
   }
 }

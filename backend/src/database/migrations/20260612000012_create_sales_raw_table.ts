@@ -26,7 +26,7 @@ export async function up(knex: Knex): Promise<void> {
     table.timestamps(true, true);
 
     // Unique constraint untuk mencegah duplikasi saat re-import
-    table.unique(['session_id', 'invoice_number', 'product_code', 'row_number']);
+    table.unique(['session_id', 'file_type', 'row_number']);
   });
 }
 

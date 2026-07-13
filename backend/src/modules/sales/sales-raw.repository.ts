@@ -28,6 +28,17 @@ export class SalesRawRepository extends BaseRepository<SalesRawDTO> {
 
     return { data: data as SalesRawDTO[], total: Number(count) };
   }
+
+  async bulkUpsert(data: Partial<SalesRawDTO>[], trx?: Knex.Transaction): Promise<void> {
+    if (!data.length) return;
+    const query = trx ? trx(this.tableName) : this.knex(this.tableName);
+    // Use raw query for PostgreSQL bulk upsert or Knex onConflict.
+    // For simplicity with generic columns, we can use onConflict
+    // We assume row_number + session_id + file_type makes it unique
+    await query.insert(data)
+      .onConflict(['session_id', 'file_type', 'row_number'])
+      .merge();
+  }
 }
 
 export const salesRawRepository = new SalesRawRepository();

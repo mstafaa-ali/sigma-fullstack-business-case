@@ -20,6 +20,19 @@ export function errorHandler(
     return;
   }
 
+  // Handle Zod validation errors
+  if (err.name === 'ZodError') {
+    res.status(400).json({
+      success: false,
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Invalid input data',
+        details: JSON.parse(err.message), // Parse stringified Zod issues
+      },
+    });
+    return;
+  }
+
   // Unexpected errors
   logger.error('Unhandled error', { error: err.message, stack: err.stack });
   res.status(500).json({

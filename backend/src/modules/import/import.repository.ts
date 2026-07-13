@@ -46,6 +46,22 @@ export class ImportRepository extends BaseRepository<ImportSession> {
     }
     return query.orderBy('created_at', 'asc');
   }
+  async updateSession(id: string, data: Partial<ImportSession>): Promise<ImportSession | null> {
+    const query = this.knex(this.tableName).where({ id });
+    const [result] = await query.update({ ...data, updated_at: this.knex.fn.now() }).returning('*');
+    return result as ImportSession | null;
+  }
+
+  async incrementSessionCounters(id: string, counters: { processed_rows?: number; error_rows?: number }): Promise<void> {
+    const updateData: Record<string, any> = { updated_at: this.knex.fn.now() };
+    if (counters.processed_rows !== undefined) {
+      updateData.processed_rows = this.knex.raw(`COALESCE(processed_rows, 0) + ?`, [counters.processed_rows]);
+    }
+    if (counters.error_rows !== undefined) {
+      updateData.error_rows = this.knex.raw(`COALESCE(error_rows, 0) + ?`, [counters.error_rows]);
+    }
+    await this.knex(this.tableName).where({ id }).update(updateData);
+  }
 }
 
 export const importRepository = new ImportRepository();

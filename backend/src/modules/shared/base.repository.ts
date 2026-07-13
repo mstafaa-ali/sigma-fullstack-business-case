@@ -7,6 +7,10 @@ export abstract class BaseRepository<T> {
     protected readonly knex: Knex = db
   ) {}
 
+  getKnex(): Knex {
+    return this.knex;
+  }
+
   async findAll(options?: {
     page?: number;
     limit?: number;

@@ -1,0 +1,31 @@
+export interface TransformedRowDTO {
+  session_id: string;
+  raw_id: number;
+  closing_date: Date | null;
+  order_date: Date | null;
+  invoice_number: string;
+  tracking_number: string | null;
+  expedition: string | null;
+  transaction_type: string | null;
+  advertiser_name: string | null;
+  platform_name: string | null;
+  store_name: string | null;
+  admin_name: string | null;
+  product_name: string | null;
+  product_code_original: string | null;
+  quantity: number;
+  omzet: number | null;
+  marketing_omzet: number | null;
+  hpp: number | null;
+  promo_code: string | null;
+  total_bayar: number | null;
+  payment_type: string | null;
+  year: number | null;
+  month_name: string | null;
+  memo: string | null;
+  region: string | null;
+  sku: string | null;
+  is_bundle_item: boolean;
+  bundle_parent_code: string | null;
+  row_number: number;
+}

@@ -19,6 +19,7 @@ export const SalesTransformedSchema = z.object({
   sku: z.string().nullable(),
   quantity: z.number().int(),
   omzet: z.number().nullable(),
+  marketing_omzet: z.number().nullable(),
   hpp: z.number().nullable(),
   promo_code: z.string().nullable(),
   total_bayar: z.number().nullable(),

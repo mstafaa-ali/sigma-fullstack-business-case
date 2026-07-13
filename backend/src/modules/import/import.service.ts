@@ -3,6 +3,8 @@ import { BaseService } from '../shared/base.service';
 import { Knex } from 'knex';
 import ExcelJS from 'exceljs';
 
+import { createImportFlow } from '../../queues/import.queue';
+
 // Note: BullMQ and real queue integration will happen in phase 4. 
 // For now, initiateImport just creates the session in DB.
 export class ImportService extends BaseService<ImportSession, any, any> {
@@ -12,10 +14,21 @@ export class ImportService extends BaseService<ImportSession, any, any> {
 
   async initiateImport(files: Express.Multer.File[]): Promise<ImportSession> {
     const fileNames = files.map(f => f.originalname);
-    return this.repository.create({
+    const session = await this.repository.create({
       status: 'pending',
       file_names: JSON.stringify(fileNames),
     });
+
+    // Step 1: Initialize the flow
+    const flowFiles = files.map(f => ({
+      path: f.path,
+      originalname: f.originalname,
+      fileType: 'UNKNOWN', // File type will be determined in validate worker
+    }));
+
+    await createImportFlow(session.id, flowFiles);
+
+    return session;
   }
 
   async getSessions(options?: { page?: number; limit?: number }): Promise<{ data: ImportSession[]; total: number }> {
