@@ -12,7 +12,7 @@ export const UploadFilesSchema = z.object({
     ),
     size: z.number().max(50 * 1024 * 1024, 'File too large (max 50MB)'),
     path: z.string(),
-  })).min(3, 'Exactly 3 files required').max(3, 'Exactly 3 files required'),
+  })).min(1, 'At least 1 file required').max(10, 'Maximum 10 files allowed'),
 });
 
 export type UploadFilesDTO = z.infer<typeof UploadFilesSchema>;

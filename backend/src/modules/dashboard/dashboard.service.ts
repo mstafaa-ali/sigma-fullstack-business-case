@@ -1,14 +1,17 @@
 import { db } from '../../config/database';
 
 export class DashboardService {
-  async getStats() {
+  async getStats(year?: number) {
+    const yearCondition = year ? `WHERE EXTRACT(YEAR FROM order_date) = ${Number(year)}` : '';
+    
     const [
       importsResult,
       rowsResult,
       omzetResult,
       successRateResult,
       recentImportsResult,
-      chartDataResult
+      chartDataResult,
+      availableYearsResult
     ] = await Promise.all([
       db('import_sessions').count('* as count').first(),
       db('import_sessions').sum('total_rows as total').first(),
@@ -22,10 +25,16 @@ export class DashboardService {
         .orderBy('created_at', 'desc')
         .limit(5),
       db.raw(`
-        SELECT TO_CHAR(order_date, 'YYYY-MM-DD') as date, SUM(omzet) as omzet 
+        SELECT TO_CHAR(order_date, 'YYYY-MM') as date, SUM(omzet) as omzet 
         FROM sales_transformed 
+        ${yearCondition}
         GROUP BY date 
         ORDER BY date ASC
+      `),
+      db.raw(`
+        SELECT DISTINCT EXTRACT(YEAR FROM order_date)::integer as year
+        FROM sales_transformed
+        ORDER BY year DESC
       `)
     ]);
 
@@ -35,7 +44,8 @@ export class DashboardService {
       totalSalesOmzet: Number(omzetResult?.total || 0),
       successRate: Number(successRateResult?.rows?.[0]?.rate || 0),
       recentImports: recentImportsResult,
-      chartData: chartDataResult?.rows || []
+      chartData: chartDataResult?.rows || [],
+      availableYears: (availableYearsResult?.rows || []).map((r: any) => r.year)
     };
   }
 }

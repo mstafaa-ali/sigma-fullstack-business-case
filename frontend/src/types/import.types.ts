@@ -25,3 +25,17 @@ export interface UploadResponse {
   sessionId: string;
   message: string;
 }
+
+export interface TransformedRow {
+  id?: number;
+  session_id: string;
+  invoice_number: string;
+  order_date: string;
+  closing_date: string;
+  product_name: string;
+  platform_name: string;
+  store_name: string;
+  omzet: number;
+  hpp: number;
+  quantity: number;
+}

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatsGrid } from '../components/dashboard/StatsGrid';
 import { RecentImports } from '../components/dashboard/RecentImports';
 import { Charts } from '../components/dashboard/Charts';
@@ -16,17 +16,19 @@ const MOCK_DATA: DashboardStats = {
   totalSalesOmzet: 0,
   successRate: 0,
   recentImports: [],
-  chartData: []
+  chartData: [],
+  availableYears: []
 };
 
 export function DashboardPage() {
+  const [selectedYear, setSelectedYear] = useState<number | undefined>(new Date().getFullYear());
   const { data, loading, error, execute } = useApi(dashboardApi.getStats, { showErrorToast: false });
 
   useEffect(() => {
-    execute().catch(() => {
+    execute(selectedYear).catch(() => {
       // Ignore error, already handled by useApi
     });
-  }, [execute]);
+  }, [execute, selectedYear]);
 
   if (loading) {
     return (
@@ -40,9 +42,11 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6 animate-fade-in max-w-7xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold text-text-primary">Dashboard</h1>
-        <p className="text-text-secondary mt-1">Overview of your data import processes and statistics.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-text-primary">Dashboard</h1>
+          <p className="text-text-secondary mt-1">Overview of your data import processes and statistics.</p>
+        </div>
       </div>
 
       {error && (
@@ -61,7 +65,12 @@ export function DashboardPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="xl:col-span-2">
-          <Charts data={stats.chartData} />
+          <Charts 
+            data={stats.chartData} 
+            availableYears={stats.availableYears}
+            selectedYear={selectedYear}
+            onYearChange={setSelectedYear}
+          />
         </div>
         <div>
           <RecentImports imports={stats.recentImports} />

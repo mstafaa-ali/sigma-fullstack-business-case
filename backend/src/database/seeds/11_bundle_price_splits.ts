@@ -17,6 +17,12 @@ export async function seed(knex: Knex): Promise<void> {
     { bundle_code: 'BDL01', item_code: 'BOXL_A', platform_id: getPlatformId('WEB'), output_type: 'MARKETING', sell_price: 190000, hpp: 27000 },
     { bundle_code: 'BDL01', item_code: 'BOXL_B', platform_id: getPlatformId('WEB'), output_type: 'FINANCE', sell_price: 93000, hpp: 22500 },
     { bundle_code: 'BDL01', item_code: 'BOXL_B', platform_id: getPlatformId('WEB'), output_type: 'MARKETING', sell_price: 90000, hpp: 22500 },
+    
+    // TIKTOK SHOP
+    { bundle_code: 'BDL01', item_code: 'BOXL_A', platform_id: getPlatformId('TIKTOK SHOP'), output_type: 'FINANCE', sell_price: 175000, hpp: 27000 },
+    { bundle_code: 'BDL01', item_code: 'BOXL_A', platform_id: getPlatformId('TIKTOK SHOP'), output_type: 'MARKETING', sell_price: 190000, hpp: 27000 },
+    { bundle_code: 'BDL01', item_code: 'BOXL_B', platform_id: getPlatformId('TIKTOK SHOP'), output_type: 'FINANCE', sell_price: 93000, hpp: 22500 },
+    { bundle_code: 'BDL01', item_code: 'BOXL_B', platform_id: getPlatformId('TIKTOK SHOP'), output_type: 'MARKETING', sell_price: 90000, hpp: 22500 },
   ];
   
   // The table may not exist yet if they just follow standard ERD without it, but let's assume it does since we created it

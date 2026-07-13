@@ -8,24 +8,56 @@ import { EmptyState } from '../ui/EmptyState';
 
 interface ChartsProps {
   data: ChartDataPoint[];
+  availableYears?: number[];
+  selectedYear?: number;
+  onYearChange?: (year: number | undefined) => void;
 }
 
-export function Charts({ data }: ChartsProps) {
+export function Charts({ data, availableYears = [], selectedYear, onYearChange }: ChartsProps) {
   if (data.length === 0) {
     return (
-      <Card className="h-[400px] flex items-center justify-center">
-        <EmptyState
-          icon={Inbox}
-          title="No chart data available"
-          description="Upload data to see your omzet trends."
-        />
+      <Card className="h-[400px] flex flex-col">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-lg font-semibold text-text-primary">Marketing Omzet Trend</h3>
+          {availableYears.length > 0 && (
+            <select
+              value={selectedYear || ''}
+              onChange={(e) => onYearChange?.(e.target.value ? Number(e.target.value) : undefined)}
+              className="bg-bg-secondary border border-border-subtle text-text-primary text-sm rounded-lg focus:ring-accent-primary focus:border-accent-primary block p-2 transition-colors"
+            >
+              {availableYears.map((year) => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          )}
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <EmptyState
+            icon={Inbox}
+            title="No chart data available"
+            description="Upload data to see your omzet trends for this year."
+          />
+        </div>
       </Card>
     );
   }
 
   return (
     <Card className="h-[400px] flex flex-col">
-      <h3 className="text-lg font-semibold text-text-primary mb-6">Marketing Omzet Trend</h3>
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold text-text-primary">Marketing Omzet Trend</h3>
+        {availableYears.length > 0 && (
+          <select
+            value={selectedYear || ''}
+            onChange={(e) => onYearChange?.(e.target.value ? Number(e.target.value) : undefined)}
+            className="bg-bg-secondary border border-border-subtle text-text-primary text-sm rounded-lg focus:ring-accent-primary focus:border-accent-primary block p-2 transition-colors"
+          >
+            {availableYears.map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        )}
+      </div>
       <div className="flex-1 w-full h-full min-h-0">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
@@ -44,6 +76,15 @@ export function Charts({ data }: ChartsProps) {
               fontSize={12}
               tickLine={false}
               axisLine={false}
+              tickFormatter={(value) => {
+                if (!value) return '';
+                const parts = value.split('-');
+                if (parts.length === 2) {
+                  const date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1);
+                  return date.toLocaleString('default', { month: 'short' });
+                }
+                return value;
+              }}
             />
             <YAxis
               stroke="var(--color-text-muted)"
@@ -62,6 +103,15 @@ export function Charts({ data }: ChartsProps) {
               }}
               itemStyle={{ color: 'var(--color-accent-primary)' }}
               formatter={(value: number) => [`Rp ${formatNumber(value)}`, 'Omzet']}
+              labelFormatter={(label) => {
+                if (!label) return '';
+                const parts = label.split('-');
+                if (parts.length === 2) {
+                  const date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1);
+                  return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+                }
+                return label;
+              }}
             />
             <Area
               type="monotone"

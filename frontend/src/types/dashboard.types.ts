@@ -5,6 +5,7 @@ export interface DashboardStats {
   successRate: number;
   recentImports: RecentImport[];
   chartData: ChartDataPoint[];
+  availableYears: number[];
 }
 
 export interface RecentImport {

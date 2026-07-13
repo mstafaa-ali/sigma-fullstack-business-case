@@ -21,7 +21,7 @@ export function DropZone({ onFilesAdded, fileCount, disabled }: DropZoneProps) {
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
       'application/vnd.ms-excel': ['.xls'],
     },
-    maxFiles: CONSTANTS.UPLOAD_FILES_REQUIRED - fileCount,
+    maxFiles: CONSTANTS.UPLOAD_MAX_FILES - fileCount,
     disabled,
   });
 
@@ -45,10 +45,10 @@ export function DropZone({ onFilesAdded, fileCount, disabled }: DropZoneProps) {
         {isDragActive ? 'Drop files here...' : 'Drag & Drop Excel Files'}
       </h3>
       <p className="text-sm text-text-secondary mb-2">
-        Upload 3 Excel files (.xlsx, .xls) — SALES DAILY, SALES MP, SALES PRODUK
+        Upload 1 or more Excel files (.xlsx, .xls) — max {CONSTANTS.UPLOAD_MAX_FILES} files
       </p>
       <p className="text-xs text-text-muted">
-        {fileCount}/{CONSTANTS.UPLOAD_FILES_REQUIRED} files selected
+        {fileCount}/{CONSTANTS.UPLOAD_MAX_FILES} files selected
       </p>
     </div>
   );
