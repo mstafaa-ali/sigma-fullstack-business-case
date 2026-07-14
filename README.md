@@ -36,6 +36,7 @@ docker-compose up -d
 Buka terminal dan masuk ke folder `backend`:
 ```bash
 cd backend
+cp .env.example .env
 npm install
 ```
 
@@ -55,6 +56,7 @@ Backend akan berjalan di `http://localhost:3000`.
 Buka terminal baru dan masuk ke folder `frontend`:
 ```bash
 cd frontend
+cp .env.example .env
 npm install
 npm run dev
 ```
