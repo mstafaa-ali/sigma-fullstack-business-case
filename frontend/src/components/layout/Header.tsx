@@ -1,34 +1,33 @@
 import React from 'react';
-import { Bell, Search, UserCircle } from 'lucide-react';
+import { Bell, ChevronDown, UserCircle, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../../hooks/useTheme';
 
 export function Header() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
-    <header className="h-16 border-b border-border-subtle bg-bg-primary/80 backdrop-blur-md flex items-center justify-between px-6 z-10 sticky top-0">
-      <div className="flex-1 flex items-center">
-        {/* Optional Search */}
-        <div className="relative w-full max-w-md hidden sm:block">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-text-muted" aria-hidden="true" />
-          </div>
-          <input
-            type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-border-subtle rounded-md leading-5 bg-bg-card text-text-primary placeholder-text-muted focus:outline-none focus:bg-bg-primary focus:border-border-hover focus:ring-1 focus:ring-border-hover sm:text-sm transition-colors"
-            placeholder="Search..."
-          />
-        </div>
-      </div>
-      
-      <div className="flex items-center gap-4">
-        <button className="p-2 rounded-full text-text-muted hover:text-text-primary hover:bg-bg-card transition-colors relative">
-          <span className="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-accent-error ring-2 ring-bg-primary" />
+    <header className="h-20 bg-bg-primary flex items-center justify-end px-8 z-10 sticky top-0 transition-colors">
+      <div className="flex items-center gap-6">
+        <button 
+          onClick={toggleTheme}
+          className="text-text-secondary hover:text-text-primary transition-colors p-2 rounded-full hover:bg-bg-card"
+        >
+          {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </button>
+
+        <button className="text-text-secondary hover:text-text-primary transition-colors relative p-2 rounded-full hover:bg-bg-card">
+          <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-accent-primary ring-2 ring-bg-primary" />
           <Bell className="h-5 w-5" aria-hidden="true" />
         </button>
         
-        <div className="flex items-center gap-2 cursor-pointer p-1.5 rounded-md hover:bg-bg-card transition-colors">
-          <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-accent-primary to-accent-secondary flex items-center justify-center">
-            <span className="text-sm font-medium text-white">AD</span>
+        <div className="flex items-center gap-3 cursor-pointer pl-4 border-l border-border-subtle/50">
+          <div className="h-9 w-9 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center border border-white shadow-sm dark:bg-gray-700 dark:border-gray-600">
+            <UserCircle className="h-9 w-9 text-gray-400 dark:text-gray-300" />
           </div>
-          <span className="text-sm font-medium text-text-primary hidden sm:block">Admin</span>
+          <div className="flex items-center gap-1">
+            <span className="text-sm font-semibold text-text-primary">Admin</span>
+            <ChevronDown className="h-4 w-4 text-text-muted" />
+          </div>
         </div>
       </div>
     </header>

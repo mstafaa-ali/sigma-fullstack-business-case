@@ -4,7 +4,7 @@ import { cn } from '../../utils/cn';
 export function Table({ children, className }: React.HTMLAttributes<HTMLTableElement>) {
   return (
     <div className="overflow-x-auto w-full">
-      <table className={cn("w-full text-sm text-left text-text-secondary", className)}>
+      <table className={cn("w-full text-sm text-left text-text-primary", className)}>
         {children}
       </table>
     </div>
@@ -13,7 +13,7 @@ export function Table({ children, className }: React.HTMLAttributes<HTMLTableEle
 
 export function TableHeader({ children, className }: React.HTMLAttributes<HTMLTableSectionElement>) {
   return (
-    <thead className={cn("text-xs text-text-muted uppercase bg-bg-secondary/50", className)}>
+    <thead className={cn("text-xs text-text-muted font-medium border-b border-border-subtle", className)}>
       {children}
     </thead>
   );
@@ -25,7 +25,7 @@ export function TableBody({ children, className }: React.HTMLAttributes<HTMLTabl
 
 export function TableRow({ children, className, ...props }: React.HTMLAttributes<HTMLTableRowElement>) {
   return (
-    <tr className={cn("border-b border-border-subtle hover:bg-bg-card/50 transition-colors", className)} {...props}>
+    <tr className={cn("hover:bg-bg-card-hover transition-colors border-b border-border-subtle/50 last:border-0", className)} {...props}>
       {children}
     </tr>
   );
@@ -33,7 +33,7 @@ export function TableRow({ children, className, ...props }: React.HTMLAttributes
 
 export function TableHead({ children, className }: React.ThHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <th scope="col" className={cn("px-6 py-3 font-medium text-text-primary whitespace-nowrap", className)}>
+    <th scope="col" className={cn("px-6 py-4 font-semibold text-text-secondary whitespace-nowrap", className)}>
       {children}
     </th>
   );
@@ -41,7 +41,7 @@ export function TableHead({ children, className }: React.ThHTMLAttributes<HTMLTa
 
 export function TableCell({ children, className }: React.TdHTMLAttributes<HTMLTableCellElement>) {
   return (
-    <td className={cn("px-6 py-4", className)}>
+    <td className={cn("px-6 py-4 font-medium", className)}>
       {children}
     </td>
   );

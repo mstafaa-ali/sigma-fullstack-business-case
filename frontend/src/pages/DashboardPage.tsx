@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { StatsGrid } from '../components/dashboard/StatsGrid';
 import { RecentImports } from '../components/dashboard/RecentImports';
 import { Charts } from '../components/dashboard/Charts';
+import { OmzetCard } from '../components/dashboard/OmzetCard';
 import { useApi } from '../hooks/useApi';
 import { dashboardApi } from '../api/dashboard.api';
 import { Spinner } from '../components/ui/Spinner';
-import { Card } from '../components/ui/Card';
 import { AlertCircle } from 'lucide-react';
 import { DashboardStats } from '../types/dashboard.types';
 
@@ -41,18 +41,18 @@ export function DashboardPage() {
   const stats = data?.data || MOCK_DATA;
 
   return (
-    <div className="space-y-6 animate-fade-in max-w-7xl mx-auto">
+    <div className="space-y-6 animate-fade-in max-w-[1400px] mx-auto pb-10">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary">Dashboard</h1>
-          <p className="text-text-secondary mt-1">Overview of your data import processes and statistics.</p>
+          <h1 className="text-2xl font-extrabold text-text-primary tracking-tight">Dashboard Overview</h1>
+          <p className="text-text-secondary mt-1 font-medium">Welcome back! Here's what's happening with your data.</p>
         </div>
       </div>
 
       {error && (
-        <div className="bg-accent-error/10 border border-accent-error/20 p-4 rounded-lg flex items-center gap-3 text-accent-error">
+        <div className="bg-accent-error/10 border border-accent-error/20 p-4 rounded-xl flex items-center gap-3 text-accent-error">
           <AlertCircle className="h-5 w-5" />
-          <p className="text-sm">Failed to load live statistics. Displaying offline data.</p>
+          <p className="text-sm font-semibold">Failed to load live statistics. Displaying offline data.</p>
         </div>
       )}
 
@@ -72,8 +72,11 @@ export function DashboardPage() {
             onYearChange={setSelectedYear}
           />
         </div>
-        <div>
-          <RecentImports imports={stats.recentImports} />
+        <div className="flex flex-col gap-6">
+          <OmzetCard totalOmzet={stats.totalSalesOmzet} />
+          <div className="flex-1 min-h-[300px]">
+            <RecentImports imports={stats.recentImports} />
+          </div>
         </div>
       </div>
     </div>

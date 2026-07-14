@@ -10,36 +10,29 @@ interface StatsGridProps {
   totalOmzet: number;
 }
 
-export function StatsGrid({ totalImports, successRate, totalRows, totalOmzet }: StatsGridProps) {
+export function StatsGrid({ totalImports, successRate, totalRows }: StatsGridProps) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
       <StatsCard
         title="Total Imports"
         value={formatNumber(totalImports)}
         icon={Database}
-        color="var(--color-accent-info)"
+        color="#3B82F6"
         subtitle="All time sessions"
       />
       <StatsCard
         title="Success Rate"
         value={`${successRate.toFixed(1)}%`}
         icon={CheckCircle}
-        color="var(--color-accent-primary)"
+        color="#10B981"
         subtitle="Completed without errors"
       />
       <StatsCard
         title="Rows Processed"
         value={formatNumber(totalRows)}
         icon={Rows}
-        color="var(--color-accent-warning)"
+        color="#F59E0B"
         subtitle="Total valid rows"
-      />
-      <StatsCard
-        title="Total Omzet"
-        value={`Rp ${formatNumber(totalOmzet)}`}
-        icon={DollarSign}
-        color="var(--color-accent-secondary)"
-        subtitle="Marketing omzet"
       />
     </div>
   );

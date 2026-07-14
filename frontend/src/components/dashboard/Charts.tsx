@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card } from '../ui/Card';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChartDataPoint } from '../../types/dashboard.types';
 import { formatNumber } from '../../utils/formatters';
 import { Inbox } from 'lucide-react';
@@ -16,14 +15,14 @@ interface ChartsProps {
 export function Charts({ data, availableYears = [], selectedYear, onYearChange }: ChartsProps) {
   if (data.length === 0) {
     return (
-      <Card className="h-[400px] flex flex-col">
+      <div className="bg-bg-card rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-border-subtle p-6 h-[400px] flex flex-col">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-text-primary">Marketing Omzet Trend</h3>
           {availableYears.length > 0 && (
             <select
               value={selectedYear || ''}
               onChange={(e) => onYearChange?.(e.target.value ? Number(e.target.value) : undefined)}
-              className="bg-bg-secondary border border-border-subtle text-text-primary text-sm rounded-lg focus:ring-accent-primary focus:border-accent-primary block p-2 transition-colors"
+              className="bg-bg-card-alt border border-border-hover text-text-primary text-sm rounded-lg focus:ring-accent-primary focus:border-accent-primary block p-2 transition-colors outline-none"
             >
               {availableYears.map((year) => (
                 <option key={year} value={year}>{year}</option>
@@ -38,19 +37,19 @@ export function Charts({ data, availableYears = [], selectedYear, onYearChange }
             description="Upload data to see your omzet trends for this year."
           />
         </div>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <Card className="h-[400px] flex flex-col">
+    <div className="bg-bg-card rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-border-subtle p-6 h-[400px] flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-text-primary">Marketing Omzet Trend</h3>
         {availableYears.length > 0 && (
           <select
             value={selectedYear || ''}
             onChange={(e) => onYearChange?.(e.target.value ? Number(e.target.value) : undefined)}
-            className="bg-bg-secondary border border-border-subtle text-text-primary text-sm rounded-lg focus:ring-accent-primary focus:border-accent-primary block p-2 transition-colors"
+            className="bg-bg-card-alt border border-border-hover text-text-primary text-sm rounded-lg focus:ring-accent-primary focus:border-accent-primary block p-2 transition-colors outline-none font-medium"
           >
             {availableYears.map((year) => (
               <option key={year} value={year}>{year}</option>
@@ -60,70 +59,67 @@ export function Charts({ data, availableYears = [], selectedYear, onYearChange }
       </div>
       <div className="flex-1 w-full h-full min-h-0">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
+          <LineChart
             data={data}
-            margin={{ top: 10, right: 30, left: 20, bottom: 0 }}
+            margin={{ top: 10, right: 30, left: 20, bottom: 10 }}
           >
-            <defs>
-              <linearGradient id="colorOmzet" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-accent-primary)" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="var(--color-accent-primary)" stopOpacity={0} />
-              </linearGradient>
-            </defs>
             <XAxis
               dataKey="date"
-              stroke="var(--color-text-muted)"
-              fontSize={12}
+              stroke="#CBD5E1"
+              tick={{ fill: '#94A3B8', fontSize: 12 }}
               tickLine={false}
-              axisLine={false}
+              axisLine={{ stroke: '#E2E8F0' }}
+              dy={10}
               tickFormatter={(value) => {
                 if (!value) return '';
                 const parts = value.split('-');
                 if (parts.length === 2) {
                   const date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1);
-                  return date.toLocaleString('default', { month: 'short' });
+                  return date.toLocaleString('default', { month: 'short' }).toLowerCase();
                 }
                 return value;
               }}
             />
             <YAxis
-              stroke="var(--color-text-muted)"
-              fontSize={12}
+              stroke="#CBD5E1"
+              tick={{ fill: '#94A3B8', fontSize: 12 }}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value) => `Rp ${formatNumber(value / 1000000)}M`}
+              dx={-10}
+              tickFormatter={(value) => (value === 0 ? '0' : `${(value / 1000000).toFixed(0)}M`)}
             />
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={true} horizontal={false} />
             <Tooltip
               contentStyle={{
-                backgroundColor: 'var(--color-bg-secondary)',
-                borderColor: 'var(--color-border-subtle)',
-                color: 'var(--color-text-primary)',
-                borderRadius: '8px',
+                backgroundColor: '#111827',
+                borderColor: '#111827',
+                color: '#FFFFFF',
+                borderRadius: '999px',
+                padding: '4px 16px',
+                fontSize: '13px',
+                fontWeight: 500,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
               }}
-              itemStyle={{ color: 'var(--color-accent-primary)' }}
-              formatter={(value: number) => [`Rp ${formatNumber(value)}`, 'Omzet']}
-              labelFormatter={(label) => {
-                if (!label) return '';
-                const parts = label.split('-');
-                if (parts.length === 2) {
-                  const date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1);
-                  return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+              itemStyle={{ color: '#FFFFFF', display: 'none' }}
+              cursor={{ stroke: '#E2E8F0', strokeWidth: 1 }}
+              labelFormatter={(label, payload) => {
+                if (payload && payload.length > 0) {
+                  return `Rp ${formatNumber(payload[0].value as number)}`;
                 }
                 return label;
               }}
             />
-            <Area
-              type="monotone"
+            <Line
+              type="natural"
               dataKey="omzet"
-              stroke="var(--color-accent-primary)"
+              stroke="var(--theme-text-primary)"
               strokeWidth={3}
-              fillOpacity={1}
-              fill="url(#colorOmzet)"
+              dot={{ r: 4, fill: 'var(--theme-text-primary)', strokeWidth: 0 }}
+              activeDot={{ r: 6, fill: 'var(--theme-text-primary)', stroke: 'var(--theme-bg-secondary)', strokeWidth: 2 }}
             />
-          </AreaChart>
+          </LineChart>
         </ResponsiveContainer>
       </div>
-    </Card>
+    </div>
   );
 }
