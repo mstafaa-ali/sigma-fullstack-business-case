@@ -68,5 +68,4 @@ Frontend akan berjalan di `http://localhost:5173`. Buka URL tersebut di browser.
 - `frontend/`: Source code React SPA.
 - `file/`: Contoh input file (DAILY, MP, PRODUK).
 - `result/`: Folder output otomatis dari hasil pemrosesan (FINANCE & MARKETING).
-- `docs/`: Dokumen requirement (`PROJECT_SPEC.md`).
 - `PROBLEM.md`: Dokumen yang mencatat kendala teknis dan solusi selama pengerjaan.
