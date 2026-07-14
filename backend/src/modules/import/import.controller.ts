@@ -115,9 +115,10 @@ export class ImportController {
   downloadOutput = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { id: sessionId, type } = req.params;
+      const typeStr = type as string;
       const validTypes = ['finance', 'marketing'];
       
-      if (!validTypes.includes(type.toLowerCase())) {
+      if (!validTypes.includes(typeStr.toLowerCase())) {
         res.status(400).json({ 
           success: false, 
           error: { message: `Invalid output type. Must be one of: ${validTypes.join(', ')}` } 
@@ -125,7 +126,7 @@ export class ImportController {
         return;
       }
 
-      const fileName = `${type.toUpperCase()}_${sessionId}.xlsx`;
+      const fileName = `${typeStr.toUpperCase()}_${sessionId}.xlsx`;
       const filePath = path.join(OUTPUT_DIR, fileName);
 
       if (!fs.existsSync(filePath)) {
@@ -137,7 +138,7 @@ export class ImportController {
       }
 
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', `attachment; filename=${type.toUpperCase()}.xlsx`);
+      res.setHeader('Content-Disposition', `attachment; filename=${typeStr.toUpperCase()}.xlsx`);
       
       const fileStream = fs.createReadStream(filePath);
       fileStream.pipe(res);
