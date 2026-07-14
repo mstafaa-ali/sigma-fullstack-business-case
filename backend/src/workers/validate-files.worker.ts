@@ -61,6 +61,23 @@ export const validateFilesProcessor = async (job: Job<ValidateJobData>) => {
 
     if (validationErrors.length > 0) {
       await importRepo.updateSession(sessionId, { status: 'failed' });
+      
+      // Log errors to database so they can be viewed/downloaded later
+      for (const errorMsg of validationErrors) {
+        const colonIndex = errorMsg.indexOf(':');
+        const fileName = colonIndex > -1 ? errorMsg.substring(0, colonIndex) : 'validation';
+        const message = colonIndex > -1 ? errorMsg.substring(colonIndex + 2) : errorMsg;
+        
+        await importRepo.createLog({
+          session_id: sessionId,
+          file_name: fileName,
+          row_number: 0,
+          log_level: 'error',
+          message: message,
+          raw_data: JSON.stringify({ step: 'validation' })
+        });
+      }
+
       await publishProgress(sessionId, {
         type: 'error',
         message: 'Validation failed',

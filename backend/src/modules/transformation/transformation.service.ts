@@ -76,6 +76,10 @@ export class TransformationService {
 
       const rawWithRows: { rawId: number, rows: TransformedRowDTO[] }[] = [];
 
+      let batchSuccess = 0;
+      let batchError = 0;
+      let batchSkipped = 0;
+
       for (const raw of rawRows) {
         try {
           const rows = await this.transformRow(raw);
@@ -83,6 +87,7 @@ export class TransformationService {
         } catch (error: any) {
           console.error(`Error transforming row ${raw.id}:`, error);
           errorCount++;
+          batchError++;
         }
         totalProcessedRawRows++;
       }
@@ -135,8 +140,10 @@ export class TransformationService {
           
           if (hasNewRows) {
             successCount++;
+            batchSuccess++;
           } else {
             skippedCount++;
+            batchSkipped++;
           }
         }
 
@@ -151,6 +158,14 @@ export class TransformationService {
           // Update raw rows status to 'validated'
           const rawIds = rawRows.map((r: any) => r.id);
           await trx('sales_raw').whereIn('id', rawIds).update({ status: 'validated', updated_at: new Date() });
+        });
+      }
+
+      if (batchSuccess > 0 || batchError > 0 || batchSkipped > 0) {
+        await importRepository.incrementSessionCounters(sessionId, {
+          success_rows: batchSuccess,
+          error_rows: batchError,
+          skipped_rows: batchSkipped,
         });
       }
 

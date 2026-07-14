@@ -52,14 +52,26 @@ export const generateOutputProcessor = async (job: Job<GenerateJobData>) => {
     // Update session with accurate total_rows from sales_raw
     const { total: totalRows } = await salesRawRepo.findBySessionId(sessionId, { page: 1, limit: 1 });
     
+    const session = await importRepo.findById(sessionId);
+    let finalStatus = 'completed';
+    if (session) {
+      if (session.success_rows === 0 && session.error_rows > 0 && (session.skipped_rows || 0) === 0) {
+        finalStatus = 'failed';
+      } else if (session.success_rows === 0 && (session.skipped_rows || 0) > 0 && session.error_rows === 0) {
+        finalStatus = 'skipped';
+      } else if (session.error_rows > 0 && session.success_rows > 0) {
+        finalStatus = 'partial_success';
+      }
+    }
+    
     await importRepo.updateSession(sessionId, { 
-      status: 'completed',
+      status: finalStatus,
       total_rows: totalRows,
     });
     
     await publishProgress(sessionId, {
       type: 'completed',
-      status: 'completed',
+      status: finalStatus,
       message: 'Output generation complete. Process finished.',
     });
     

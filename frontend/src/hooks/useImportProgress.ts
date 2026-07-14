@@ -26,19 +26,33 @@ export function useImportProgress(sessionId: string | null) {
       const { type, data } = lastEvent;
 
       if (type === 'progress') {
-        setProgressState({
-          status: data.status,
-          progress: data.progress,
-          message: data.message,
-          totalRows: data.totalRows,
-          processedRows: data.processedRows,
+        setProgressState(prev => {
+          let calculatedProgress = data.progress;
+          
+          if (typeof calculatedProgress !== 'number') {
+            if (typeof data.current === 'number' && typeof data.total === 'number' && data.total > 0) {
+              calculatedProgress = (data.current / data.total) * 100;
+            } else {
+              // fallback to previous progress, or if it's processing step, you could just increment visually
+              // for now keep the previous progress
+              calculatedProgress = prev.progress;
+            }
+          }
+
+          return {
+            status: data.status || prev.status,
+            progress: calculatedProgress || 0,
+            message: data.message || prev.message,
+            totalRows: data.totalRows || prev.totalRows,
+            processedRows: data.processedRows || prev.processedRows,
+          };
         });
       } else if (type === 'completed') {
         setProgressState(prev => ({
           ...prev,
-          status: 'completed',
+          status: data.status || 'completed',
           progress: 100,
-          message: 'Process completed successfully',
+          message: data.message || 'Process completed successfully',
         }));
         disconnect();
       } else if (type === 'error') {

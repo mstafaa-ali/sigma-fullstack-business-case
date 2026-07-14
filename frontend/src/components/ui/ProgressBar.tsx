@@ -34,7 +34,7 @@ export function ProgressBar({
           {label && <span className="text-text-secondary">{label}</span>}
           {showPercentage && (
             <span className="text-text-primary font-semibold">
-              {Math.round(value)}%
+              {Math.round(Number(value) || 0)}%
             </span>
           )}
         </div>
@@ -47,8 +47,8 @@ export function ProgressBar({
             animated && value < 100 && 'animate-progress-stripe bg-[length:1rem_1rem]'
           )}
           style={{
-            width: `${Math.min(value, 100)}%`,
-            backgroundImage: animated && value < 100
+            width: `${Math.min(Number(value) || 0, 100)}%`,
+            backgroundImage: animated && (Number(value) || 0) < 100
               ? 'linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%)'
               : undefined,
           }}

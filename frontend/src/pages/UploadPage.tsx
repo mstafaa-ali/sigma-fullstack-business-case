@@ -17,13 +17,13 @@ export function UploadPage() {
     upload().catch(() => {});
   };
 
-  const isUploading = uploading || (sessionId && progressState.status !== 'completed' && progressState.status !== 'failed');
-  const isCompleted = progressState.status === 'completed';
+  const isCompleted = progressState.status === 'completed' || progressState.status === 'skipped' || progressState.status === 'partial_success';
+  const isUploading = uploading || (sessionId && !isCompleted && progressState.status !== 'failed');
 
   if (isCompleted && sessionId) {
     return (
       <div className="max-w-3xl mx-auto mt-8 animate-fade-in">
-        <UploadSummary sessionId={sessionId} onReset={reset} />
+        <UploadSummary sessionId={sessionId} status={progressState.status} onReset={reset} />
       </div>
     );
   }
@@ -75,7 +75,7 @@ export function UploadPage() {
             </div>
           </div>
         ) : (
-          <UploadProgress progressState={progressState} />
+          <UploadProgress progressState={progressState} sessionId={sessionId} onReset={reset} />
         )}
       </Card>
     </div>

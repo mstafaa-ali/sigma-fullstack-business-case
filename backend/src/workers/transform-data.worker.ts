@@ -57,17 +57,13 @@ export const transformDataProcessor = async (job: Job<TransformJobData>) => {
       publishProgress(sessionId, {
         type: 'progress',
         step: 'transforming',
+        current,
+        total,
         message: `Transformed ${current}/${total} rows...`,
       });
     });
     
-    const importRepo = new ImportRepository();
-    await importRepo.incrementSessionCounters(sessionId, {
-      success_rows: result.success,
-      skipped_rows: result.skipped,
-      error_rows: result.errors,
-    });
-    
+
     await importQueue.add(JOB_NAMES.GENERATE_OUTPUT, { sessionId });
     
     return result;

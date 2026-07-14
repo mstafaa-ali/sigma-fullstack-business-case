@@ -5,12 +5,15 @@ import { Download, FileText, CheckCircle2 } from 'lucide-react';
 import { importApi } from '../../api/import.api';
 import { useToast } from '../../hooks/useToast';
 
+import { ImportSessionStatus } from '../../types/import.types';
+
 interface UploadSummaryProps {
   sessionId: string;
+  status?: ImportSessionStatus;
   onReset: () => void;
 }
 
-export function UploadSummary({ sessionId, onReset }: UploadSummaryProps) {
+export function UploadSummary({ sessionId, status, onReset }: UploadSummaryProps) {
   const { showError } = useToast();
   const [hasErrors, setHasErrors] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -19,8 +22,9 @@ export function UploadSummary({ sessionId, onReset }: UploadSummaryProps) {
     // Check if the session has any error logs
     importApi.getLogs(sessionId, 1, 1)
       .then((res) => {
-        const logs = res.data?.data || [];
-        setHasErrors(logs.length > 0);
+        const responseData = res.data?.data as any;
+        const logs = responseData?.data || responseData || [];
+        setHasErrors(Array.isArray(logs) && logs.length > 0);
       })
       .catch(() => {
         setHasErrors(false);
@@ -44,6 +48,8 @@ export function UploadSummary({ sessionId, onReset }: UploadSummaryProps) {
     }
   };
 
+  const isSkipped = status === 'skipped';
+
   return (
     <Card className="text-center py-8">
       <div className="bg-accent-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -51,12 +57,15 @@ export function UploadSummary({ sessionId, onReset }: UploadSummaryProps) {
       </div>
       <h3 className="text-2xl font-bold text-text-primary mb-2">Import Completed</h3>
       <p className="text-text-secondary mb-8">
-        Your data has been successfully processed and transformed.
+        {isSkipped 
+          ? "All rows were skipped because they already exist in the database."
+          : "Your data has been successfully processed and transformed."}
       </p>
 
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
         <Button
           variant="outline"
+          disabled={isSkipped}
           onClick={() => window.open(`/api/import/sessions/${sessionId}/outputs/finance`, '_blank')}
           className="w-full sm:w-auto"
         >
@@ -65,6 +74,7 @@ export function UploadSummary({ sessionId, onReset }: UploadSummaryProps) {
         </Button>
         <Button
           variant="outline"
+          disabled={isSkipped}
           onClick={() => window.open(`/api/import/sessions/${sessionId}/outputs/marketing`, '_blank')}
           className="w-full sm:w-auto"
         >

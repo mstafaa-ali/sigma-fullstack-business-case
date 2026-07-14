@@ -90,7 +90,7 @@ export function SessionDetailPage() {
               <Button
                 variant="secondary"
                 className="w-full justify-start"
-                disabled={session.status !== 'completed'}
+                disabled={session.status !== 'completed' && session.status !== 'partial_success'}
                 onClick={() => window.open(`/api/import/sessions/${session.id}/outputs/finance`, '_blank')}
               >
                 <FileText className="mr-3 h-5 w-5 text-accent-secondary" />
@@ -104,7 +104,7 @@ export function SessionDetailPage() {
               <Button
                 variant="secondary"
                 className="w-full justify-start"
-                disabled={session.status !== 'completed'}
+                disabled={session.status !== 'completed' && session.status !== 'partial_success'}
                 onClick={() => window.open(`/api/import/sessions/${session.id}/outputs/marketing`, '_blank')}
               >
                 <FileText className="mr-3 h-5 w-5 text-accent-primary" />
