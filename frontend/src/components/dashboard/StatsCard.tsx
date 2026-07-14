@@ -12,31 +12,21 @@ interface StatsCardProps {
 export function StatsCard({ title, value, subtitle, icon: Icon, color }: StatsCardProps) {
   return (
     <div
-      className="glass-card p-6 transition-all duration-250 cursor-default hover:border-border-hover hover:shadow-glow hover:-translate-y-0.5"
+      className="bg-bg-card rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.02)] border border-border-subtle p-6 flex items-center gap-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.04)]"
     >
-      <div className="flex justify-between items-start">
-        <div>
-          <p className="text-text-secondary text-sm mb-1">
-            {title}
-          </p>
-          <h2
-            className="text-3xl font-bold bg-clip-text text-transparent text-white"
-            style={{ backgroundImage: color || 'var(--gradient-primary)' }}
-          >
-            {value}
-          </h2>
-          {subtitle && (
-            <p className="text-text-muted text-xs mt-1">
-              {subtitle}
-            </p>
-          )}
-        </div>
-        <div
-          className="p-3 rounded-lg"
-          style={{ background: `${color || 'var(--color-accent-primary)'}15` }}
-        >
-          <Icon size={24} style={{ color: color || 'var(--color-accent-primary)' }} />
-        </div>
+      <div
+        className="p-4 rounded-full flex-shrink-0"
+        style={{ background: `${color || 'var(--color-accent-primary)'}15` }}
+      >
+        <Icon size={24} style={{ color: color || 'var(--color-accent-primary)' }} />
+      </div>
+      <div>
+        <h2 className="text-2xl font-extrabold text-text-primary leading-tight">
+          {value}
+        </h2>
+        <p className="text-text-secondary text-sm font-medium mt-0.5">
+          {title}
+        </p>
       </div>
     </div>
   );
