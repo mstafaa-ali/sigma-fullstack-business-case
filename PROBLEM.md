@@ -10,5 +10,5 @@ Dokumen ini berisi rangkuman mengenai kendala teknis yang dihadapi saat membangu
 ### 2. Duplikasi Data Saat Re-import
 **Masalah:** Apabila *user* mengunggah file yang sama, atau mencoba mengimpor ulang *session* yang gagal, ada kemungkinan data penjualan tergandakan di dalam *database*.
 **Solusi:**
-- Menambahkan **Unique Constraint** secara komposit (contohnya perpaduan `session_id`, `file_type`, dan `row_number`) di skema tabel utama *database*.
+- Menambahkan **Unique Constraint** secara komposit pada tabel *database*, yaitu perpaduan `session_id`, `file_type`, dan `row_number` pada tabel `sales_raw`, serta perpaduan `session_id`, `invoice_number`, `product_name`, `product_code_original`, dan `row_number` pada tabel `sales_transformed`.
 - Menggunakan pendekatan **Bulk Upsert** (fitur `ON CONFLICT DO UPDATE` di PostgreSQL) via pustaka `knex`. Hal ini memastikan bahwa baris data yang sama akan tertimpa atau di-*update* statusnya, sementara baris yang baru akan ditambahkan dengan aman tanpa menimbulkan *conflict error*.
